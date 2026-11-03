@@ -37,11 +37,11 @@
 # DEVELOPMENT & PROJECT PLANNER (Opsional - sesuaikan kebutuhan)
 # =====================================================================
 # Jika folder 'planner' hanya berisi catatan pribadi/coretan dev
-/planner/
+# /planner/
 
 # Jika spesifikasi/dokumen ini tidak ingin di-push ke GitHub publik
-SPEC.md
-SECURITY-STANDARDS.md
+# SPEC.md
+# SECURITY-STANDARDS.md
 
 # =====================================================================
 # OS JUNK FILES (Pembersihan tambahan)
