@@ -1,0 +1,50 @@
+# =====================================================================
+# DEPENDENCIES & ENVIRONMENT (Wajib diabaikan)
+# =====================================================================
+/vendor/
+.env
+/config/config.local.php
+
+# =====================================================================
+# DYNAMIC STORAGE & RUNTIME DATA (Abaikan data produksi/temporary)
+# =====================================================================
+# Abaikan semua file json dan lock di dalam data (berisi data user/task real)
+/storage/data/*.json
+/storage/data/*.lock
+/storage/data/backup/
+
+# Abaikan seluruh log aplikasi dan file sampah/temporary
+/storage/logs/*
+/storage/ratelimit/*
+/storage/tmp/*
+
+# =====================================================================
+# SECURITY & EXCLUSIONS (Jaga struktur folder kosong di Git)
+# =====================================================================
+# Biarkan file pembatas struktur ini tetap ter-track oleh Git
+!/storage/data/index.html
+!/storage/logs/.gitkeep
+!/storage/ratelimit/.gitkeep
+!/storage/tmp/.gitkeep
+
+# MENGATASI ERROR WINDOWS LOCK:
+# Karena Windows sering mengunci file .htaccess di folder internal web,
+# abaikan .htaccess bawaan storage agar tidak merusak proses 'git add .'
+!/storage/.htaccess
+!/storage/data/.htaccess
+!/storage/data/index.html
+# =====================================================================
+# DEVELOPMENT & PROJECT PLANNER (Opsional - sesuaikan kebutuhan)
+# =====================================================================
+# Jika folder 'planner' hanya berisi catatan pribadi/coretan dev
+/planner/
+
+# Jika spesifikasi/dokumen ini tidak ingin di-push ke GitHub publik
+SPEC.md
+SECURITY-STANDARDS.md
+
+# =====================================================================
+# OS JUNK FILES (Pembersihan tambahan)
+# =====================================================================
+.DS_Store
+Thumbs.db
