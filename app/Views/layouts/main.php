@@ -17,7 +17,24 @@ $content = is_string($data['content'] ?? null) ? $data['content'] : '';
 <body>
     <?php require __DIR__ . '/../partials/navbar.php'; ?>
     <main class="container">
-        <?php require __DIR__ . '/../partials/flash.php'; ?>
+        <?php
+        /** @var \App\Core\Session|null $flashSession */
+        $flashSession = $data['session'] ?? null;
+        if ($flashSession instanceof \App\Core\Session) {
+            $flashSuccess = $flashSession->pullFlash('success');
+            if (is_string($flashSuccess) && $flashSuccess !== '') {
+                echo '<div class="flash flash--success" role="status">' . e($flashSuccess) . '</div>';
+            }
+            $flashError = $flashSession->pullFlash('error');
+            if (is_string($flashError) && $flashError !== '') {
+                echo '<div class="flash flash--error" role="alert">' . e($flashError) . '</div>';
+            }
+            $flashInfo = $flashSession->pullFlash('info');
+            if (is_string($flashInfo) && $flashInfo !== '') {
+                echo '<div class="flash flash--info" role="status">' . e($flashInfo) . '</div>';
+            }
+        }
+        ?>
         <?= $content ?>
     </main>
 </body>

@@ -2,20 +2,183 @@
 
 declare(strict_types=1);
 
+use App\Controllers\AuthController;
+use App\Core\Csrf;
+use App\Core\JsonStore;
+use App\Core\Logger;
+use App\Core\RateLimiter;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Router;
+use App\Core\Session;
 use App\Core\View;
+use App\Repositories\CategoryRepository;
+use App\Repositories\UserRepository;
 
 $config = require __DIR__ . '/../app/bootstrap.php';
+
+/* ── Dependencies ────────────────────────────────────────────── */
 $request = new Request();
-$view = new View(__DIR__ . '/../app/Views');
-$router = new Router(static function () use ($view): Response {
-    return Response::html($view->render('errors/404'), 404);
+$session = new Session($config);
+$logger = new Logger('security.log');
+$rateLimiter = new RateLimiter(
+    (int) ($config['login_max_attempts'] ?? 5),
+    900
+);
+$userRepository = new UserRepository($config['data_path']);
+$categoryRepository = new CategoryRepository($config['data_path']);
+
+/* ── View factory ───────────────────────────────────────────── */
+$viewFactory = static fn (): View => new View(__DIR__ . '/../app/Views');
+
+/* ── Auth middleware helpers ──────────────────────────────────── */
+$requireAuth = static function () use ($session): void {
+    if ($session->get('user_id') === null) {
+        Response::redirect('/login')->send();
+        exit;
+    }
+};
+
+$requireGuest = static function () use ($session, $viewFactory, $request): void {
+    if ($session->get('user_id') !== null) {
+        Response::redirect('/tasks')->send();
+        exit;
+    }
+};
+
+/* ── Router ─────────────────────────────────────────────────── */
+$router = new Router(static function () use ($viewFactory): Response {
+    return Response::html($viewFactory()->render('errors/404'), 404);
 });
 
-$router->get('/', static function () use ($view): Response {
-    return Response::html($view->render('home', ['title' => 'Beranda']));
+/* Public routes */
+$router->get('/', static function () use ($session, $viewFactory, $request): Response {
+    if ($session->get('user_id') !== null) {
+        return Response::redirect('/tasks');
+    }
+
+    return Response::html($viewFactory()->render('home', ['title' => 'Beranda']));
+});
+
+/* Auth routes */
+$authControllerFactory = static function () use ($request, $userRepository, $categoryRepository, $rateLimiter, $logger, $session): AuthController {
+    return new AuthController(
+        $request,
+        $userRepository,
+        $categoryRepository,
+        $rateLimiter,
+        $logger,
+        $session
+    );
+};
+
+$router->get('/login', static function () use ($authControllerFactory, $requireGuest): Response {
+    $requireGuest();
+
+    return (new AuthControllerProxy($authControllerFactory()))->showLogin();
+});
+
+$router->post('/login', static function () use ($authControllerFactory, $requireGuest): Response {
+    $requireGuest();
+
+    return (new AuthControllerProxy($authControllerFactory()))->handleLogin();
+});
+
+$router->get('/register', static function () use ($authControllerFactory, $requireGuest): Response {
+    $requireGuest();
+
+    return (new AuthControllerProxy($authControllerFactory()))->showRegister();
+});
+
+$router->post('/register', static function () use ($authControllerFactory, $requireGuest): Response {
+    $requireGuest();
+
+    return (new AuthControllerProxy($authControllerFactory()))->handleRegister();
+});
+
+$router->post('/logout', static function () use ($authControllerFactory, $requireAuth): Response {
+    $requireAuth();
+
+    return (new AuthControllerProxy($authControllerFactory()))->logout();
+});
+
+/* Tasks route (stub — placeholder until M3) */
+$router->get('/tasks', static function () use ($session, $viewFactory): Response {
+    if ($session->get('user_id') === null) {
+        Response::redirect('/login')->send();
+        exit;
+    }
+
+    return Response::html($viewFactory()->render('home', ['title' => 'Tugas', 'content' => '<p>Belum ada tugas.</p>']));
+});
+
+/* Categories route (stub — placeholder until M2) */
+$router->get('/categories', static function () use ($session, $viewFactory): Response {
+    if ($session->get('user_id') === null) {
+        Response::redirect('/login')->send();
+        exit;
+    }
+
+    return Response::html($viewFactory()->render('home', ['title' => 'Kategori', 'content' => '<p>Fitur kategori dalam pengembangan.</p>']));
+});
+
+/* Import route stub */
+$router->get('/import', static function () use ($session): Response {
+    if ($session->get('user_id') === null) {
+        Response::redirect('/login')->send();
+        exit;
+    }
+
+    return Response::redirect('/tasks');
+});
+
+/* Export route stub */
+$router->get('/export/xlsx', static function () use ($session): Response {
+    if ($session->get('user_id') === null) {
+        Response::redirect('/login')->send();
+        exit;
+    }
+
+    return Response::redirect('/tasks');
 });
 
 $router->dispatch($request)->send();
+
+/**
+ * Proxy that maps controller method names to AuthController methods.
+ * This bridges the closure-based router (returning Response) with
+ * the controller (which also returns Response).
+ *
+ * @internal
+ */
+final class AuthControllerProxy
+{
+    public function __construct(private readonly AuthController $controller)
+    {
+    }
+
+    public function showLogin(): Response
+    {
+        return $this->controller->showLogin();
+    }
+
+    public function handleLogin(): Response
+    {
+        return $this->controller->handleLogin();
+    }
+
+    public function showRegister(): Response
+    {
+        return $this->controller->showRegister();
+    }
+
+    public function handleRegister(): Response
+    {
+        return $this->controller->handleRegister();
+    }
+
+    public function logout(): Response
+    {
+        return $this->controller->logout();
+    }
+}
