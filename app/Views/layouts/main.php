@@ -13,6 +13,7 @@ $content = is_string($data['content'] ?? null) ? $data['content'] : '';
     <meta name="description" content="RemindEDU, manajemen tugas sederhana.">
     <title><?= e($title) ?> — RemindEDU</title>
     <link rel="stylesheet" href="/assets/css/app.css">
+    <script src="/assets/js/dropdown.js" defer></script>
 </head>
 <body>
     <?php require __DIR__ . '/../partials/navbar.php'; ?>

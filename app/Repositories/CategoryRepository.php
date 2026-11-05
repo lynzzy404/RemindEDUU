@@ -5,10 +5,22 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Core\JsonStore;
+use RuntimeException;
 
 final class CategoryRepository
 {
     private JsonStore $store;
+    private JsonStore $taskStore;
+
+    /** @var list<string> */
+    public const ALLOWED_COLORS = [
+        '#FFE14D',
+        '#FF6B9D',
+        '#4D9DFF',
+        '#5EEAA0',
+        '#FF9F43',
+        '#B794F6',
+    ];
 
     /** @var array<string, array<string, mixed>> */
     private array $cache = [];
@@ -16,6 +28,7 @@ final class CategoryRepository
     public function __construct(string $dataPath)
     {
         $this->store = new JsonStore($dataPath . '/categories.json');
+        $this->taskStore = new JsonStore($dataPath . '/tasks.json');
     }
 
     /** @return list<array<string, mixed>> */
@@ -72,39 +85,121 @@ final class CategoryRepository
     /** @param array<string, mixed> $category */
     public function create(string $userId, array $category): array
     {
-        $category['id'] = JsonStore::generateId('cat');
-        $category['user_id'] = $userId;
-        $category['created_at'] = gmdate('Y-m-d\TH:i:s\Z');
-        $category['updated_at'] = $category['created_at'];
+        $name = trim((string) ($category['name'] ?? ''));
+        $color = strtoupper(trim((string) ($category['color'] ?? '')));
+        if ($name === '' || !in_array($color, self::ALLOWED_COLORS, true)) {
+            throw new RuntimeException('Invalid category data.');
+        }
 
-        $this->store->transaction(static function (array &$document) use ($category): void {
-            $document['items'][] = $category;
+        $categoryId = JsonStore::generateId('cat');
+        $now = gmdate('Y-m-d\TH:i:s\Z');
+        $created = [
+            'id' => $categoryId,
+            'user_id' => $userId,
+            'name' => $name,
+            'color' => $color,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+
+        $this->store->transaction(static function (array &$document) use ($created): void {
+            $userCategories = array_filter(
+                $document['items'],
+                static fn ($item): bool => is_array($item) && ($item['user_id'] ?? null) === $created['user_id']
+            );
+            if (count($userCategories) >= 50) {
+                throw new RuntimeException('Category limit reached.');
+            }
+            $normalizedName = mb_strtolower($created['name']);
+            foreach ($userCategories as $item) {
+                if (mb_strtolower(trim((string) ($item['name'] ?? ''))) === $normalizedName) {
+                    throw new RuntimeException('Category name already exists.');
+                }
+            }
+            $document['items'][] = $created;
         });
 
-        return $category;
+        $this->cache = [];
+
+        return $created;
     }
 
     /** @param array<string, mixed> $updates */
     public function update(string $id, string $userId, array $updates): void
     {
-        $this->store->transaction(static function (array &$document) use ($id, $userId, $updates): void {
+        $name = trim((string) ($updates['name'] ?? ''));
+        $color = strtoupper(trim((string) ($updates['color'] ?? '')));
+        if ($name === '' || !in_array($color, self::ALLOWED_COLORS, true)) {
+            throw new RuntimeException('Invalid category data.');
+        }
+
+        $this->store->transaction(static function (array &$document) use ($id, $userId, $name, $color): void {
+            $found = false;
+            foreach ($document['items'] as $candidate) {
+                if (is_array($candidate) && ($candidate['user_id'] ?? null) === $userId
+                    && ($candidate['id'] ?? null) !== $id
+                    && mb_strtolower(trim((string) ($candidate['name'] ?? ''))) === mb_strtolower($name)) {
+                    throw new RuntimeException('Category name already exists.');
+                }
+            }
             foreach ($document['items'] as &$item) {
                 if (is_array($item) && ($item['id'] ?? null) === $id && ($item['user_id'] ?? null) === $userId) {
-                    $item = array_merge($item, $updates, ['updated_at' => gmdate('Y-m-d\TH:i:s\Z')]);
+                    $item = array_merge($item, ['name' => $name, 'color' => $color, 'updated_at' => gmdate('Y-m-d\TH:i:s\Z')]);
+                    $found = true;
                     break;
                 }
             }
+            if (!$found) {
+                throw new RuntimeException('Category not found.');
+            }
         });
+        $this->cache = [];
     }
 
     public function delete(string $id, string $userId): void
     {
-        $this->store->transaction(static function (array &$document) use ($id, $userId): void {
+        $this->store->transaction(function (array &$document) use ($id, $userId): void {
+            $found = false;
+            foreach ($document['items'] as $item) {
+                if (is_array($item) && ($item['id'] ?? null) === $id && ($item['user_id'] ?? null) === $userId) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                throw new RuntimeException('Category not found.');
+            }
+
+            $this->taskStore->transaction(static function (array &$tasks) use ($id, $userId): void {
+                foreach ($tasks['items'] as &$task) {
+                    if (is_array($task) && ($task['user_id'] ?? null) === $userId && ($task['category_id'] ?? null) === $id) {
+                        $task['category_id'] = null;
+                        $task['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+                    }
+                }
+            });
+
             $document['items'] = array_values(array_filter(
                 $document['items'],
                 static fn ($item): bool => !is_array($item) || ($item['id'] ?? null) !== $id || ($item['user_id'] ?? null) !== $userId
             ));
         });
+        $this->cache = [];
+    }
+
+    /** @return array<string, int> */
+    public function taskCountsByCategory(string $userId): array
+    {
+        $data = $this->taskStore->read();
+        $counts = [];
+        foreach ($data['items'] as $task) {
+            if (is_array($task) && ($task['user_id'] ?? null) === $userId && is_string($task['category_id'] ?? null)) {
+                $categoryId = $task['category_id'];
+                $counts[$categoryId] = ($counts[$categoryId] ?? 0) + 1;
+            }
+        }
+
+        return $counts;
     }
 
     public function seedDefaults(string $userId): void

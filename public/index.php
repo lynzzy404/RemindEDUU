@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Controllers\CategoryController;
 use App\Core\Csrf;
 use App\Core\JsonStore;
 use App\Core\Logger;
@@ -103,23 +104,40 @@ $router->post('/logout', static function () use ($authControllerFactory, $requir
 });
 
 /* Tasks route (stub — placeholder until M3) */
-$router->get('/tasks', static function () use ($session, $viewFactory): Response {
+$router->get('/tasks', static function () use ($session, $viewFactory, $categoryRepository): Response {
     if ($session->get('user_id') === null) {
         Response::redirect('/login')->send();
         exit;
     }
 
-    return Response::html($viewFactory()->render('home', ['title' => 'Tugas', 'content' => '<p>Belum ada tugas.</p>']));
+    return Response::html($viewFactory()->render('tasks/index', [
+        'title' => 'Tugas',
+        'categories' => $categoryRepository->allByUser((string) $session->get('user_id')),
+    ]));
 });
 
-/* Categories route (stub — placeholder until M2) */
-$router->get('/categories', static function () use ($session, $viewFactory): Response {
-    if ($session->get('user_id') === null) {
-        Response::redirect('/login')->send();
-        exit;
-    }
+$categoryControllerFactory = static function () use ($request, $categoryRepository, $logger, $session): CategoryController {
+    return new CategoryController($request, $categoryRepository, $logger, $session);
+};
 
-    return Response::html($viewFactory()->render('home', ['title' => 'Kategori', 'content' => '<p>Fitur kategori dalam pengembangan.</p>']));
+$router->get('/categories', static function () use ($categoryControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $categoryControllerFactory()->index();
+});
+
+$router->post('/categories', static function () use ($categoryControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $categoryControllerFactory()->create();
+});
+
+$router->post('/categories/{id}/update', static function (Request $request, array $parameters) use ($categoryControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $categoryControllerFactory()->update($parameters['id']);
+});
+
+$router->post('/categories/{id}/delete', static function (Request $request, array $parameters) use ($categoryControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $categoryControllerFactory()->delete($parameters['id']);
 });
 
 /* Import route stub */
