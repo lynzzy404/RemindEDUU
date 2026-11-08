@@ -125,7 +125,7 @@ final class AuthController
 
         $this->logger->security('login_success', $user['id'], $this->request->ip(), []);
 
-        Auth::login((string) $user['id'], (string) ($user['name'] ?? ''));
+        Auth::login($user['id']);
 
         return Response::redirect($this->redirectAfterLogin());
     }

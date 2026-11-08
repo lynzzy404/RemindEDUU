@@ -1,4 +1,4 @@
-# 📝 RemindEDU
+# RemindEDU
 
 Aplikasi manajemen tugas sederhana bergaya **Neu Brutalism**, dibangun dengan **PHP Native** dan penyimpanan **file JSON lokal** (tanpa database).
 
@@ -8,22 +8,22 @@ Aplikasi manajemen tugas sederhana bergaya **Neu Brutalism**, dibangun dengan **
 
 ---
 
-## ✨ Fitur
+## Fitur
 
 | Fitur | Deskripsi |
 |---|---|
-| 🔐 Login & Register | Session aman, password di-hash dengan `password_hash()`, CSRF & rate limit |
-| ✅ CRUD Tugas | Tambah, ubah, hapus, tandai selesai; prioritas, status, dan tenggat |
-| 🏷️ Kategori Kustom | Kategori pribadi berwarna dengan **custom dropdown** yang aksesibel |
-| 🔎 Filter & Cari | Cari judul, filter status/kategori/prioritas, sorting, pagination |
-| 📤 Export | Unduh tugas sebagai **XLSX** atau **PDF** |
-| 📥 Import | Unggah **XLS/XLSX** dengan validasi per baris + template siap pakai |
-| 🧭 Navigasi responsif | Sidebar tetap di desktop dan drawer aksesibel di mobile/tablet |
-| 🛡️ Aman | Proteksi file JSON, anti-XSS, anti-CSRF, anti formula injection |
+| Login & Register | Session aman, password di-hash dengan `password_hash()`, CSRF & rate limit |
+| CRUD Tugas | Tambah, ubah, hapus, tandai selesai; prioritas, status, dan tenggat |
+| Kategori Kustom | Kategori pribadi berwarna dengan **custom dropdown** yang aksesibel |
+| Filter & Cari | Cari judul, filter status/kategori/prioritas, sorting, pagination |
+| Export | Unduh tugas sebagai **XLSX** atau **PDF** |
+| Import | Unggah **XLS/XLSX** dengan validasi per baris + template siap pakai |
+| Navigasi responsif | Sidebar tetap di desktop dan drawer aksesibel di mobile/tablet |
+| Aman | Proteksi file JSON, anti-XSS, anti-CSRF, anti formula injection |
 
 ---
 
-## 🎨 Preview
+## Preview
 
 Screenshot rilis disimpan di `docs/screenshots/` ketika tersedia. Instalasi dan verifikasi tidak
 bergantung pada screenshot.
@@ -39,7 +39,7 @@ bergantung pada screenshot.
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 - **PHP >= 8.1** (Native, tanpa framework)
 - **Storage:** JSON (`storage/data/*.json`) dengan `flock` + atomic write
@@ -48,7 +48,7 @@ bergantung pada screenshot.
 
 ---
 
-## 📁 Struktur Proyek (ringkas)
+## Struktur Proyek (ringkas)
 
 ```
 RemindEDU/
@@ -66,7 +66,7 @@ Struktur lengkap ada di [`SPEC.md`](./SPEC.md#23-struktur-folder-worktree).
 
 ---
 
-## 🚀 Instalasi & Menjalankan di Lokal
+## Instalasi & Menjalankan di Lokal
 
 ### Prasyarat
 - PHP **8.1+** dengan ekstensi: `mbstring`, `json`, `zip`, `xml`, `gd`, `fileinfo`
@@ -104,7 +104,7 @@ php -S localhost:8000 -t public public/index.php
 
 Buka **http://localhost:8000** lalu daftar akun baru.
 
-> ⚠️ `php -S` hanya untuk **development**. Jangan dipakai di production.
+> **Peringatan:** `php -S` hanya untuk **development**. Jangan dipakai di production.
 
 Untuk instalasi bersih, salin `config/config.example.php` menjadi
 `config/config.local.php`, lalu sesuaikan `app_env`, `app_url`, dan `data_path` bila perlu.
@@ -123,7 +123,7 @@ Edit `config/config.php` (atau buat `config/config.local.php` yang tidak di-comm
 
 ---
 
-## 🌐 Deploy (Apache / Nginx)
+## Deploy (Apache / Nginx)
 
 **Aturan utama:** arahkan document root **hanya ke `public/`**.
 
@@ -196,7 +196,7 @@ document root. Jangan mengunggah backup ke `public/`.
 
 ---
 
-## 📥 Format Import
+## Format Import
 
 Header baris pertama harus **persis**:
 
@@ -211,7 +211,7 @@ Header baris pertama harus **persis**:
 
 ---
 
-## 🔒 Keamanan
+## Keamanan
 
 Aplikasi mengikuti [`SECURITY-STANDARDS.md`](./SECURITY-STANDARDS.md), antara lain:
 - Hashing password `password_hash()` (Argon2id / bcrypt)
@@ -222,7 +222,7 @@ Aplikasi mengikuti [`SECURITY-STANDARDS.md`](./SECURITY-STANDARDS.md), antara la
 
 ---
 
-## 🗺️ Rencana Pengembangan
+## Rencana Pengembangan
 
 | Milestone | Fokus | File |
 |---|---|---|
@@ -233,11 +233,11 @@ Aplikasi mengikuti [`SECURITY-STANDARDS.md`](./SECURITY-STANDARDS.md), antara la
 | M4 | Import & export | [`planner/M4.md`](./planner/M4.md) |
 | M5 | Hardening, QA & rilis | [`planner/M5.md`](./planner/M5.md) |
 
-> 🤖 **Untuk AI Agent / kontributor:** sebelum mengerjakan milestone apa pun, **wajib baca [`SPEC.md`](./SPEC.md) dan [`SECURITY-STANDARDS.md`](./SECURITY-STANDARDS.md)** terlebih dahulu.
+> **Untuk AI Agent / kontributor:** sebelum mengerjakan milestone apa pun, **wajib baca [`SPEC.md`](./SPEC.md) dan [`SECURITY-STANDARDS.md`](./SECURITY-STANDARDS.md)** terlebih dahulu.
 
 ---
 
-## ⚠️ Batasan
+## Batasan
 
 - Storage file-based cocok untuk skala kecil (± ≤ 1.000 user / ≤ 10.000 tugas).
 - Tidak dirancang untuk multi-server (locking bersifat lokal).
@@ -265,7 +265,7 @@ git tag -a v1.0.0 -m "Release v1.0.0"
 
 ---
 
-## 🧯 Troubleshooting
+## Troubleshooting
 
 | Masalah | Solusi |
 |---|---|
@@ -277,6 +277,6 @@ git tag -a v1.0.0 -m "Release v1.0.0"
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
 Tentukan lisensi proyek (mis. MIT) di file `LICENSE`.
