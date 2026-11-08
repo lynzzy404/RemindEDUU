@@ -188,7 +188,6 @@ textarea:focus-visible {
 }
 
 .sidebar__username {
-  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
