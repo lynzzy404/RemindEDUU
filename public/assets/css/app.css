@@ -400,6 +400,45 @@ h1 {
   font-weight: 600;
 }
 
+.task-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.import-form {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 48px);
+}
+
+.import-form p {
+  color: #333;
+  font-weight: 600;
+}
+
+.import-result {
+  margin: 0 auto 32px;
+  max-width: 720px;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  font-weight: 700;
+}
+
+.import-result--success {
+  background: var(--green);
+}
+
+.import-result--error {
+  background: var(--danger);
+}
+
+.import-result ul {
+  margin-bottom: 0;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -726,6 +765,16 @@ h1 {
 
   .dashboard-header .btn {
     width: 100%;
+    text-align: center;
+  }
+
+  .task-header__actions {
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .task-header__actions .btn {
+    flex: 1 1 160px;
     text-align: center;
   }
 

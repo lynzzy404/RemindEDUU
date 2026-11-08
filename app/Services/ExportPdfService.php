@@ -11,6 +11,8 @@ use Dompdf\Options;
 
 final class ExportPdfService
 {
+    private const MAX_RENDERED_TASKS = 250;
+
     public function __construct(private readonly TaskRepository $taskRepository)
     {
     }
@@ -19,8 +21,8 @@ final class ExportPdfService
     public function export(string $userId, array $filters, array $user, array $categoryMap): string
     {
         $tasks = $this->taskRepository->allByUser($userId, $filters);
-        $truncated = count($tasks) > 1000;
-        $tasks = array_slice($tasks, 0, 1000);
+        $truncated = count($tasks) > self::MAX_RENDERED_TASKS;
+        $tasks = array_slice($tasks, 0, self::MAX_RENDERED_TASKS);
         $view = new View(__DIR__ . '/../Views');
         $html = $view->render('export/pdf', [
             'tasks' => $tasks,

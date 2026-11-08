@@ -59,7 +59,10 @@ final class ImportController
             $this->logger->security('import_success', $userId, (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'), ['rows' => $result['imported']]);
             $this->rateLimiter->clear($key);
             return Response::html($this->render(['title' => 'Import Tugas', 'csrf_token' => (new Csrf())->token(), 'result' => $result]));
-        } catch (RuntimeException|ReaderException $exception) {
+        } catch (ReaderException $exception) {
+            $this->logger->security('upload_rejected', $userId, (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'), ['reason' => 'spreadsheet_parse_failed']);
+            return Response::html($this->render(['title' => 'Import Tugas', 'csrf_token' => (new Csrf())->token(), 'error' => 'File spreadsheet tidak dapat diproses.']), 422);
+        } catch (RuntimeException $exception) {
             $this->logger->security('upload_rejected', $userId, (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'), ['reason' => $exception->getMessage()]);
             return Response::html($this->render(['title' => 'Import Tugas', 'csrf_token' => (new Csrf())->token(), 'error' => $exception->getMessage()]), 422);
         }

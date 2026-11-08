@@ -108,7 +108,7 @@ $monthNames = [
 	</div>
 
 	<?php if (($data['truncated'] ?? false) === true): ?>
-		<div class="notice">Data dibatasi hingga 1000 tugas.</div>
+		<div class="notice">Data dibatasi hingga 250 tugas agar PDF tetap aman diproses.</div>
 	<?php endif; ?>
 
 	<table>

@@ -24,14 +24,15 @@ Aplikasi manajemen tugas sederhana bergaya **Neu Brutalism**, dibangun dengan **
 
 ## 🎨 Preview
 
-> Tambahkan screenshot di folder `docs/screenshots/` lalu sesuaikan path di bawah.
+Screenshot rilis disimpan di `docs/screenshots/` ketika tersedia. Instalasi dan verifikasi tidak
+bergantung pada screenshot.
 
 | Halaman | Preview |
 |---|---|
-| Login | `docs/screenshots/login.png` |
-| Daftar Tugas | `docs/screenshots/tasks.png` |
-| Kategori & Dropdown | `docs/screenshots/categories.png` |
-| Import/Export | `docs/screenshots/import-export.png` |
+| Login | Belum disertakan dalam source distribution |
+| Daftar Tugas | Belum disertakan dalam source distribution |
+| Kategori & Dropdown | Belum disertakan dalam source distribution |
+| Import/Export | Belum disertakan dalam source distribution |
 
 **Gaya visual:** border hitam 3px, hard shadow `4px 4px 0 #000`, latar krem `#FFF8E7`, aksen kuning, pink, biru, dan hijau.
 
@@ -104,6 +105,10 @@ Buka **http://localhost:8000** lalu daftar akun baru.
 
 > ⚠️ `php -S` hanya untuk **development**. Jangan dipakai di production.
 
+Untuk instalasi bersih, salin `config/config.example.php` menjadi
+`config/config.local.php`, lalu sesuaikan `app_env`, `app_url`, dan `data_path` bila perlu.
+File `config.local.php` tidak boleh di-commit.
+
 ### Konfigurasi
 Edit `config/config.php` (atau buat `config/config.local.php` yang tidak di-commit):
 
@@ -170,6 +175,24 @@ Setelah deploy, **uji** bahwa URL berikut menghasilkan 403/404:
 /app/bootstrap.php
 ```
 
+### Permission dan backup
+
+Jalankan sebagai user web server pada Linux:
+
+```bash
+find storage -type d -exec chmod 750 {} +
+find storage/data -type f -name '*.json' -exec chmod 640 {} +
+```
+
+Backup sebelum pemeliharaan:
+
+```bash
+./scripts/backup.sh
+```
+
+Backup berisi salinan `storage/data/` dengan nama timestamp dan disimpan di luar
+document root. Jangan mengunggah backup ke `public/`.
+
 ---
 
 ## 📥 Format Import
@@ -218,6 +241,26 @@ Aplikasi mengikuti [`SECURITY-STANDARDS.md`](./SECURITY-STANDARDS.md), antara la
 - Storage file-based cocok untuk skala kecil (± ≤ 1.000 user / ≤ 10.000 tugas).
 - Tidak dirancang untuk multi-server (locking bersifat lokal).
 - Jika data membesar, migrasikan ke database (SQLite/MySQL).
+
+Import dibatasi 2 MB dan 1.000 baris. Export PDF dibatasi 250 tugas per file
+agar proses Dompdf tetap memiliki batas memori yang aman.
+Penyimpanan JSON memakai lock lokal sehingga tidak cocok untuk multi-server atau
+volume jaringan tanpa koordinasi lock.
+
+## Rilis v1.0.0
+
+Versi rilis yang diusulkan: `v1.0.0`. Sebelum membuat tag, jalankan:
+
+```bash
+composer install --no-dev --prefer-dist
+composer audit
+```
+
+Lalu buat annotated tag pada commit rilis yang sudah direview:
+
+```bash
+git tag -a v1.0.0 -m "Release v1.0.0"
+```
 
 ---
 
