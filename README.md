@@ -5,6 +5,7 @@ Aplikasi manajemen tugas sederhana bergaya **Neu Brutalism**, dibangun dengan **
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Storage](https://img.shields.io/badge/Storage-JSON-000000?style=for-the-badge)
 ![Style](https://img.shields.io/badge/UI-Neu%20Brutalism-FFE14D?style=for-the-badge&labelColor=000000)
+![License](https://img.shields.io/badge/License-MIT-5EEAA0?style=for-the-badge&labelColor=000000)
 
 ---
 
@@ -279,4 +280,4 @@ git tag -a v1.0.0 -m "Release v1.0.0"
 
 ## Lisensi
 
-Tentukan lisensi proyek (mis. MIT) di file `LICENSE`.
+Proyek ini dilisensikan di bawah [MIT License](LICENSE).
