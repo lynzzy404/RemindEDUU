@@ -1,6 +1,6 @@
 # RemindEDU Security Audit — M5
 
-Tanggal audit: 2026-11-06  
+Tanggal audit: 2026-11-06
 Basis: `SECURITY-STANDARDS.md` §11, `SPEC.md`, planner M5
 
 ## Checklist
