@@ -16,15 +16,25 @@ use App\Core\RateLimiter;
 use App\Repositories\CategoryRepository;
 use App\Repositories\UserRepository;
 
-$config = require __DIR__ . '/../config/config.php';
-$dataPath = $config['data_path'];
+// Isolated data directory so the run never touches storage/data/*.json.
+$dataPath = __DIR__ . '/../storage/tmp/smoke_' . bin2hex(random_bytes(8));
+if (!mkdir($dataPath, 0750)) {
+    fwrite(STDERR, 'FAIL - cannot create isolated data directory' . PHP_EOL);
+    exit(1);
+}
 
-// Reset data to a clean state before the run
-foreach (['users.json', 'categories.json', 'tasks.json'] as $file) {
-    $path = $dataPath . '/' . $file;
-    if (is_writable($path)) {
-        file_put_contents($path, json_encode(['schema_version' => 1, 'items' => []], JSON_PRETTY_PRINT));
+// Shutdown hook instead of finally: finally does not run when exit() is called.
+register_shutdown_function(static function () use ($dataPath): void {
+    foreach (scandir($dataPath) ?: [] as $entry) {
+        if ($entry !== '.' && $entry !== '..') {
+            unlink($dataPath . '/' . $entry);
+        }
     }
+    rmdir($dataPath);
+});
+
+foreach (['users.json', 'categories.json', 'tasks.json'] as $file) {
+    file_put_contents($dataPath . '/' . $file, json_encode(['schema_version' => 1, 'items' => []], JSON_PRETTY_PRINT));
 }
 
 $assert = static function (string $label, bool $condition): void {
