@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.0] - 2026-11-08
+
+### Added
+
+- Responsive authenticated navigation with a fixed desktop sidebar and accessible mobile/tablet drawer.
+- Keyboard focus trap, Escape/overlay close, scroll locking, reduced-motion support, and no-JavaScript navigation fallback.
+
+### Changed
+
+- Replaced the authenticated top navbar with the responsive sidebar shell while keeping guest and error pages on a simple header.
+
 ## [1.0.0] - 2026-11-08
 
 ### Added

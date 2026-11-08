@@ -6,7 +6,7 @@
 | Item | Nilai |
 |---|---|
 | Nama proyek | RemindEDU |
-| Versi spec | 1.0.0 |
+| Versi spec | 1.1.0 |
 | Bahasa UI | Indonesia |
 | Tech stack | PHP Native (>= 8.1), tanpa framework |
 | Storage | File JSON lokal (tanpa MySQL/SQLite) |
@@ -64,6 +64,7 @@ RemindEDU/
 │       │   └── app.css          # design tokens + komponen neu brutalism
 │       ├── js/
 │       │   ├── dropdown.js      # custom dropdown kategori
+│       │   ├── sidebar.js      # drawer, focus trap, responsive state
 │       │   └── app.js           # konfirmasi hapus, toast, dll.
 │       └── img/
 ├── app/
@@ -95,7 +96,8 @@ RemindEDU/
 │   │   └── ExportPdfService.php
 │   └── Views/
 │       ├── layouts/main.php
-│       ├── partials/            # navbar, flash, dropdown, pagination
+│       ├── partials/            # sidebar, flash, dropdown, pagination
+│       │   ├── sidebar.php      # navigasi user: desktop sidebar + mobile drawer
 │       ├── auth/{login,register}.php
 │       ├── tasks/{index,form}.php
 │       ├── categories/index.php
@@ -382,10 +384,24 @@ Font **self-hosted** atau system font (tidak memuat dari CDN pihak ketiga, selar
 | Dropdown | panel berborder + shadow, opsi hover kuning, opsi aktif tebal |
 | Modal konfirmasi hapus | overlay solid semi-transparan, kartu putih berborder |
 
+### Sidebar Navigasi Responsif
+- Hanya dirender untuk user yang sudah login. Guest dan halaman error memakai header sederhana tanpa sidebar.
+- Urutan menu: logo `RemindEDU`, Tugas (`/tasks`), Kategori (`/categories`), Import (`/import`), Export XLSX (`/export/xlsx`), Export PDF (`/export/pdf`). Area bawah berisi nama user ter-escape dan form Logout `POST` dengan token CSRF.
+- Path aktif dihitung server-side. Item aktif memakai latar `--yellow`, hard shadow, dan `aria-current="page"`.
+- Pada desktop (`min-width: 1024px`), sidebar fixed/sticky di kiri selebar 260px, tinggi viewport, border kanan 3px, dan menu dapat di-scroll.
+- Di bawah 1024px, top bar menampilkan logo dan tombol hamburger. Drawer muncul dari kiri dengan overlay; tombol hamburger memakai `aria-label`, `aria-expanded`, dan `aria-controls`.
+- Drawer dapat ditutup melalui tombol X, overlay, Escape, atau klik menu. Saat terbuka fokus masuk dan terperangkap di drawer; saat tertutup fokus kembali ke hamburger. Scroll body dikunci melalui class CSS, bukan inline style.
+- JavaScript berada di file eksternal dan hanya progressive enhancement. Tanpa JavaScript, menu tetap tampil sebagai blok navigasi yang dapat digunakan.
+- Target sentuh minimal 44px, nama panjang dipotong ellipsis, drawer mendukung scroll internal, resize ke desktop membersihkan state, dan `prefers-reduced-motion` meniadakan animasi geser.
+
 ### 6.4 Layout & Responsif
-- Navbar: logo "RemindEDU", tautan Tugas / Kategori / Import / Export, tombol Logout.
-- Desktop: grid 2–3 kolom kartu; mobile (< 640px): 1 kolom, navbar jadi menu lipat.
+- Layout user memakai shell sidebar responsif dari §6.3; navbar atas lama tidak digunakan pada halaman privat.
+- Desktop (`min-width: 1024px`): sidebar tetap di kiri selebar 260px; konten utama bergeser 260px dan memiliki area scroll sendiri.
+- Mobile/tablet (`< 1024px`): sidebar tersembunyi, top bar berada di atas konten, dan navigasi dibuka sebagai drawer dengan overlay.
+- Guest (`/login`, `/register`) dan halaman error memakai header sederhana tanpa sidebar.
+- Grid 2–3 kolom kartu pada layar lebar dan 1 kolom pada layar sempit.
 - Empty state: ilustrasi sederhana + CTA "Tambah Tugas Pertama".
+- Modal konfirmasi, custom dropdown kategori, flash message, dan filter bar harus tetap berada di atas konten/drawer sesuai konteksnya tanpa tertimpa overlay secara tidak sengaja.
 
 ---
 

@@ -18,6 +18,7 @@ Aplikasi manajemen tugas sederhana bergaya **Neu Brutalism**, dibangun dengan **
 | 🔎 Filter & Cari | Cari judul, filter status/kategori/prioritas, sorting, pagination |
 | 📤 Export | Unduh tugas sebagai **XLSX** atau **PDF** |
 | 📥 Import | Unggah **XLS/XLSX** dengan validasi per baris + template siap pakai |
+| 🧭 Navigasi responsif | Sidebar tetap di desktop dan drawer aksesibel di mobile/tablet |
 | 🛡️ Aman | Proteksi file JSON, anti-XSS, anti-CSRF, anti formula injection |
 
 ---
@@ -55,7 +56,7 @@ RemindEDU/
 ├── app/           # Core, Controllers, Repositories, Services, Views
 ├── config/        # konfigurasi
 ├── storage/       # data JSON, log, tmp  (DI LUAR web root)
-├── planner/       # M0.md ... M5.md (rencana kerja)
+├── planner/       # M0.md ... M6.md (rencana kerja)
 ├── SPEC.md
 ├── SECURITY-STANDARDS.md
 └── README.md
