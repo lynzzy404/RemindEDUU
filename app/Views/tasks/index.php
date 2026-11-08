@@ -29,7 +29,11 @@ $today = gmdate('Y-m-d');
         <h1 class="page-title">Tugas kamu</h1>
         <p class="page-lead">Satu tempat untuk semua hal yang perlu kamu selesaikan.</p>
     </div>
-    <a class="btn btn--primary" href="/tasks/create">Tambah tugas</a>
+    <div class="task-header__actions">
+        <a class="btn btn--primary" href="/tasks/create">Tambah tugas</a>
+        <a class="btn" href="/export/xlsx<?= e($queryUrl() === '/tasks?' ? '' : '?' . (parse_url($queryUrl(), PHP_URL_QUERY) ?? '')) ?>">Export XLSX</a>
+        <a class="btn" href="/export/pdf<?= e($queryUrl() === '/tasks?' ? '' : '?' . (parse_url($queryUrl(), PHP_URL_QUERY) ?? '')) ?>">Export PDF</a>
+    </div>
 </section>
 
 <section class="summary-grid" aria-label="Ringkasan tugas">

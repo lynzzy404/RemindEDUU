@@ -14,6 +14,7 @@ $content = is_string($data['content'] ?? null) ? $data['content'] : '';
     <title><?= e($title) ?> — RemindEDU</title>
     <link rel="stylesheet" href="/assets/css/app.css">
     <script src="/assets/js/dropdown.js" defer></script>
+    <script src="/assets/js/app.js" defer></script>
 </head>
 <body>
     <?php require __DIR__ . '/../partials/navbar.php'; ?>

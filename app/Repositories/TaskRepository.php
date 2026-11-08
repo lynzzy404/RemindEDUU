@@ -87,6 +87,12 @@ final class TaskRepository
         return null;
     }
 
+    /** @param array<string, string> $filters @return list<array<string, mixed>> */
+    public function allByUser(string $userId, array $filters = []): array
+    {
+        return $this->filteredByUser($userId, $filters);
+    }
+
     /** @return array{total: int, completed: int, overdue: int} */
     public function summaryByUser(string $userId): array
     {

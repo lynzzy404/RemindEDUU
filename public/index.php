@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
+use App\Controllers\ExportController;
+use App\Controllers\ImportController;
 use App\Controllers\TaskController;
 use App\Core\Csrf;
 use App\Core\JsonStore;
@@ -169,24 +171,45 @@ $router->post('/categories/{id}/delete', static function (Request $request, arra
     return $categoryControllerFactory()->delete($parameters['id']);
 });
 
-/* Import route stub */
-$router->get('/import', static function () use ($session): Response {
-    if ($session->get('user_id') === null) {
-        Response::redirect('/login')->send();
-        exit;
-    }
+$exportControllerFactory = static function () use ($request, $taskRepository, $categoryRepository, $userRepository, $session): ExportController {
+    return new ExportController($request, $taskRepository, $categoryRepository, $userRepository, $session);
+};
 
-    return Response::redirect('/tasks');
+$router->get('/export/xlsx', static function () use ($exportControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $exportControllerFactory()->xlsx();
 });
 
-/* Export route stub */
-$router->get('/export/xlsx', static function () use ($session): Response {
-    if ($session->get('user_id') === null) {
-        Response::redirect('/login')->send();
-        exit;
-    }
+$router->get('/export/pdf', static function () use ($exportControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $exportControllerFactory()->pdf();
+});
 
-    return Response::redirect('/tasks');
+$router->get('/import/template', static function () use ($exportControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $exportControllerFactory()->template();
+});
+
+$importControllerFactory = static function () use ($config, $rateLimiter, $userRepository, $taskRepository, $categoryRepository, $logger, $session): ImportController {
+    return new ImportController(
+        $config['data_path'],
+        $rateLimiter,
+        $userRepository,
+        $taskRepository,
+        $categoryRepository,
+        $logger,
+        $session
+    );
+};
+
+$router->get('/import', static function () use ($importControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $importControllerFactory()->show();
+});
+
+$router->post('/import', static function () use ($importControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $importControllerFactory()->import();
 });
 
 $router->dispatch($request)->send();
