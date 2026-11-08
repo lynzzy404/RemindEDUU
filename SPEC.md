@@ -410,6 +410,7 @@ Summary card pada layar <=480px memiliki tinggi target sekitar 64–88px dengan 
 - Grid 2–3 kolom kartu pada layar lebar dan 1 kolom pada layar sempit.
 - Empty state: ilustrasi sederhana + CTA "Tambah Tugas Pertama".
 - Modal konfirmasi, custom dropdown kategori, flash message, dan filter bar harus tetap berada di atas konten/drawer sesuai konteksnya tanpa tertimpa overlay secara tidak sengaja.
+- Filter tugas menampilkan pencarian judul/deskripsi yang menyaring kartu tugas secara langsung melalui JavaScript eksternal sebagai progressive enhancement. Filter status, prioritas, kategori, dan pengurutan tetap tersedia sebagai filter server-side dan dapat diciutkan untuk menghemat ruang; tanpa JavaScript, form GET tetap berfungsi seperti biasa.
 
 ---
 

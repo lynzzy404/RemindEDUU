@@ -12,15 +12,21 @@ final class CategoryRepository
     private JsonStore $store;
     private JsonStore $taskStore;
 
-    /** @var list<string> */
-    public const ALLOWED_COLORS = [
-        '#FFE14D',
-        '#FF6B9D',
-        '#4D9DFF',
-        '#5EEAA0',
-        '#FF9F43',
-        '#B794F6',
+    /** @var array<string, string> Add new colors here as HEX => display name. */
+    public const COLOR_NAMES = [
+        '#FFE14D' => 'Kuning',
+        '#FF6B9D' => 'Pink',
+        '#4D9DFF' => 'Biru',
+        '#5EEAA0' => 'Hijau',
+        '#FF9F43' => 'Oranye',
+        '#B794F6' => 'Ungu',
     ];
+
+    /** @return list<string> */
+    public static function allowedColors(): array
+    {
+        return array_keys(self::COLOR_NAMES);
+    }
 
     /** @var array<string, array<string, mixed>> */
     private array $cache = [];
@@ -87,7 +93,7 @@ final class CategoryRepository
     {
         $name = trim((string) ($category['name'] ?? ''));
         $color = strtoupper(trim((string) ($category['color'] ?? '')));
-        if ($name === '' || !in_array($color, self::ALLOWED_COLORS, true)) {
+        if ($name === '' || !in_array($color, self::allowedColors(), true)) {
             throw new RuntimeException('Invalid category data.');
         }
 
@@ -129,7 +135,7 @@ final class CategoryRepository
     {
         $name = trim((string) ($updates['name'] ?? ''));
         $color = strtoupper(trim((string) ($updates['color'] ?? '')));
-        if ($name === '' || !in_array($color, self::ALLOWED_COLORS, true)) {
+        if ($name === '' || !in_array($color, self::allowedColors(), true)) {
             throw new RuntimeException('Invalid category data.');
         }
 

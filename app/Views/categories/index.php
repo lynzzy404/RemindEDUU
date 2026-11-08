@@ -9,6 +9,14 @@ $old = $data['old'] ?? [];
 $categories = is_array($data['categories'] ?? null) ? $data['categories'] : [];
 $taskCounts = is_array($data['task_counts'] ?? null) ? $data['task_counts'] : [];
 $colors = is_array($data['colors'] ?? null) ? $data['colors'] : [];
+$colorNames = [
+    '#FFE14D' => 'Kuning',
+    '#FF6B9D' => 'Pink',
+    '#4D9DFF' => 'Biru',
+    '#5EEAA0' => 'Hijau',
+    '#FF9F43' => 'Oranye',
+    '#B794F6' => 'Ungu',
+];
 ?>
 <section class="page-header">
     <div>
@@ -35,7 +43,7 @@ $colors = is_array($data['colors'] ?? null) ? $data['colors'] : [];
                         <label class="color-swatch" data-color="<?= e($color) ?>">
                             <input type="radio" name="color" value="<?= e($color) ?>" <?= ($old['color'] ?? $colors[0] ?? '') === $color ? 'checked' : '' ?>>
                             <span class="category-chip" data-color="<?= e($color) ?>"></span>
-                            <span><?= e($color) ?></span>
+                            <span><?= e($colorNames[$color] ?? 'Warna') ?></span>
                         </label>
                     <?php endforeach; ?>
                 </div>
@@ -74,7 +82,7 @@ $colors = is_array($data['colors'] ?? null) ? $data['colors'] : [];
                                 <label for="color-<?= e($categoryId) ?>">Warna</label>
                                 <select class="input" id="color-<?= e($categoryId) ?>" name="color">
                                     <?php foreach ($colors as $color): ?>
-                                        <option value="<?= e($color) ?>" <?= ($category['color'] ?? '') === $color ? 'selected' : '' ?>><?= e($color) ?></option>
+                                        <option value="<?= e($color) ?>" <?= ($category['color'] ?? '') === $color ? 'selected' : '' ?>><?= e($colorNames[$color] ?? 'Warna') ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <button type="submit" class="btn btn--secondary">Simpan</button>

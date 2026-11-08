@@ -36,53 +36,62 @@ $today = gmdate('Y-m-d');
     </div>
 </section>
 
-<section class="summary-grid" aria-label="Ringkasan tugas">
-    <article class="card summary-card"><span>Total</span><strong><?= (int) ($summary['total'] ?? 0) ?></strong><small>semua tugas</small></article>
-    <article class="card summary-card summary-card--green"><span>Selesai</span><strong><?= (int) ($summary['completed'] ?? 0) ?></strong><small>sudah beres</small></article>
-    <article class="card summary-card summary-card--pink"><span>Terlambat</span><strong><?= (int) ($summary['overdue'] ?? 0) ?></strong><small>perlu perhatian</small></article>
-</section>
 
 <section class="filter-bar card" aria-label="Filter tugas">
     <form method="GET" action="/tasks" class="filter-bar__form">
-        <div class="form-group">
+        <div class="form-group filter-bar__search">
             <label for="task-search">Cari tugas</label>
-            <input class="input" id="task-search" name="q" type="search" value="<?= e((string) ($filters['q'] ?? '')) ?>" placeholder="Cari judul atau deskripsi...">
+            <input class="input" id="task-search" name="q" type="search" value="<?= e((string) ($filters['q'] ?? '')) ?>" placeholder="Cari judul/deskripsi..." data-live-search>
         </div>
-        <?php category_dropdown($categories, 'category', (string) ($filters['category'] ?? '')); ?>
-        <div class="form-group">
-            <label for="task-status">Status</label>
-            <select class="input" id="task-status" name="status">
-                <option value="">Semua</option>
-                <?php foreach ($statusLabels as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= ($filters['status'] ?? '') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="task-priority">Prioritas</label>
-            <select class="input" id="task-priority" name="priority">
-                <option value="">Semua</option>
-                <?php foreach ($priorityLabels as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= ($filters['priority'] ?? '') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="task-sort">Urutkan</label>
-            <select class="input" id="task-sort" name="sort">
-                <?php foreach (['created_at' => 'Terbaru', 'due_date' => 'Tenggat', 'priority' => 'Prioritas', 'title' => 'Judul'] as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= ($filters['sort'] ?? 'created_at') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <select class="input filter-direction" name="direction" aria-label="Arah urutan">
-            <option value="desc" <?= ($filters['direction'] ?? 'desc') === 'desc' ? 'selected' : '' ?>>↓</option>
-            <option value="asc" <?= ($filters['direction'] ?? '') === 'asc' ? 'selected' : '' ?>>↑</option>
-        </select>
-        <button type="submit" class="btn btn--secondary">Terapkan</button>
-        <a class="btn" href="/tasks">Reset</a>
+        <details class="filter-bar__advanced">
+            <summary class="filter-bar__summary">
+                <span>Filter lainnya</span>
+                <span class="filter-bar__toggle" aria-hidden="true">−</span>
+            </summary>
+            <div class="filter-bar__advanced-grid">
+                <?php category_dropdown($categories, 'category', (string) ($filters['category'] ?? '')); ?>
+                <div class="form-group">
+                    <label for="task-status">Status</label>
+                    <select class="input" id="task-status" name="status">
+                        <option value="">Semua</option>
+                        <?php foreach ($statusLabels as $value => $label): ?>
+                            <option value="<?= e($value) ?>" <?= ($filters['status'] ?? '') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Prioritas</label>
+                    <select class="input" id="task-priority" name="priority">
+                        <option value="">Semua</option>
+                        <?php foreach ($priorityLabels as $value => $label): ?>
+                            <option value="<?= e($value) ?>" <?= ($filters['priority'] ?? '') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-sort">Urutkan</label>
+                    <select class="input" id="task-sort" name="sort">
+                        <?php foreach (['created_at' => 'Terbaru', 'due_date' => 'Tenggat', 'priority' => 'Prioritas', 'title' => 'Judul'] as $value => $label): ?>
+                            <option value="<?= e($value) ?>" <?= ($filters['sort'] ?? 'created_at') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <select class="input filter-direction" name="direction" aria-label="Arah urutan">
+                    <option value="desc" <?= ($filters['direction'] ?? 'desc') === 'desc' ? 'selected' : '' ?>>↓</option>
+                    <option value="asc" <?= ($filters['direction'] ?? '') === 'asc' ? 'selected' : '' ?>>↑</option>
+                </select>
+                <button type="submit" class="btn btn--secondary">Terapkan</button>
+                <a class="btn" href="/tasks">Reset</a>
+            </div>
+        </details>
     </form>
 </section>
+
+        <section class="summary-grid" aria-label="Ringkasan tugas">
+            <article class="card summary-card"><span>Total</span><strong><?= (int) ($summary['total'] ?? 0) ?></strong><small>semua tugas</small></article>
+            <article class="card summary-card summary-card--green"><span>Selesai</span><strong><?= (int) ($summary['completed'] ?? 0) ?></strong><small>sudah beres</small></article>
+            <article class="card summary-card summary-card--pink"><span>Terlambat</span><strong><?= (int) ($summary['overdue'] ?? 0) ?></strong><small>perlu perhatian</small></article>
+        </section>
 
 <?php if ($tasks === []): ?>
     <section class="empty-state card" aria-label="Daftar tugas kosong">
@@ -92,7 +101,7 @@ $today = gmdate('Y-m-d');
         <a class="btn btn--primary" href="/tasks/create">Tambah tugas pertama</a>
     </section>
 <?php else: ?>
-    <section class="task-grid" aria-label="Daftar tugas">
+    <section class="task-grid" aria-label="Daftar tugas" data-live-results>
         <?php foreach ($tasks as $task): ?>
             <?php
             $taskId = (string) ($task['id'] ?? '');

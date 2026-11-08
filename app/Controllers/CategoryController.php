@@ -40,7 +40,8 @@ final class CategoryController
             'categories' => $this->categoryRepository->allByUser($userId),
             'task_counts' => $this->categoryRepository->taskCountsByCategory($userId),
             'csrf_token' => (new Csrf())->token(),
-            'colors' => CategoryRepository::ALLOWED_COLORS,
+            'colors' => CategoryRepository::allowedColors(),
+            'color_names' => CategoryRepository::COLOR_NAMES,
         ]));
     }
 
@@ -60,7 +61,7 @@ final class CategoryController
         $validator = new Validator();
         $validator->validate(
             ['name' => $name, 'color' => $color],
-            ['name' => 'required|min:1|max:30', 'color' => 'required|in:' . implode(',', CategoryRepository::ALLOWED_COLORS)]
+            ['name' => 'required|min:1|max:30', 'color' => 'required|in:' . implode(',', CategoryRepository::allowedColors())]
         );
 
         if ($validator->fails() || !Validator::isValidUtf8($name)) {
@@ -107,7 +108,7 @@ final class CategoryController
         $validator = new Validator();
         $validator->validate(
             ['name' => $name, 'color' => $color],
-            ['name' => 'required|min:1|max:30', 'color' => 'required|in:' . implode(',', CategoryRepository::ALLOWED_COLORS)]
+            ['name' => 'required|min:1|max:30', 'color' => 'required|in:' . implode(',', CategoryRepository::allowedColors())]
         );
         if ($validator->fails() || !Validator::isValidUtf8($name)) {
             return $this->validationResponse($validator->errors(), $name, $color);
@@ -177,7 +178,8 @@ final class CategoryController
             'categories' => $this->categoryRepository->allByUser((string) Auth::id()),
             'task_counts' => $this->categoryRepository->taskCountsByCategory((string) Auth::id()),
             'csrf_token' => (new Csrf())->token(),
-            'colors' => CategoryRepository::ALLOWED_COLORS,
+            'colors' => CategoryRepository::allowedColors(),
+            'color_names' => CategoryRepository::COLOR_NAMES,
             'errors' => $errors,
             'old' => ['name' => $name, 'color' => $color],
         ], 422), 422);

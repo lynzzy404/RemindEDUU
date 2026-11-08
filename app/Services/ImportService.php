@@ -198,11 +198,12 @@ final class ImportService
         }
         $new = [];
         $newKeys = [];
+        $colors = CategoryRepository::allowedColors();
         foreach ($rows as $row) {
             $name = trim((string) $row['category_name']);
             $key = mb_strtolower($name);
             if ($name !== '' && !isset($existing[$key]) && !isset($newKeys[$key])) {
-                $new[$name] = CategoryRepository::ALLOWED_COLORS[count($new) % count(CategoryRepository::ALLOWED_COLORS)];
+                $new[$name] = $colors[count($new) % count($colors)];
                 $newKeys[$key] = true;
             }
         }
