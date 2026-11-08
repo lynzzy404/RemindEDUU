@@ -7,6 +7,7 @@ use App\Controllers\CategoryController;
 use App\Controllers\ExportController;
 use App\Controllers\ImportController;
 use App\Controllers\TaskController;
+use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\JsonStore;
 use App\Core\Logger;
@@ -38,8 +39,15 @@ $taskRepository = new TaskRepository($config['data_path']);
 $viewFactory = static fn (): View => new View(__DIR__ . '/../app/Views');
 
 /* ── Auth middleware helpers ──────────────────────────────────── */
-$requireAuth = static function () use ($session): void {
-    if ($session->get('user_id') === null) {
+$requireAuth = static function () use ($session, $userRepository, $logger, $request): void {
+    $userId = $session->get('user_id');
+    if ($userId === null) {
+        Response::redirect('/login')->send();
+        exit;
+    }
+
+    if ((new Auth($userRepository))->user() === null) {
+        $logger->security('session_orphaned', (string) $userId, $request->ip());
         Response::redirect('/login')->send();
         exit;
     }
