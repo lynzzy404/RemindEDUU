@@ -48,10 +48,13 @@ final class Auth
         return !self::check();
     }
 
-    public static function login(string $userId): void
+    public static function login(string $userId, ?string $userName = null): void
     {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $userId;
+        if ($userName !== null && $userName !== '') {
+            $_SESSION['user_name'] = $userName;
+        }
     }
 
     public static function logout(): void

@@ -188,6 +188,7 @@ textarea:focus-visible {
 }
 
 .sidebar__username {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -200,7 +201,7 @@ textarea:focus-visible {
 
 .btn--logout {
   width: 100%;
-  background: var(--pink);
+  background: var(--danger);
 }
 
 .mobile-topbar {

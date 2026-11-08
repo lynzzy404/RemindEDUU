@@ -7,20 +7,40 @@ use App\Core\Auth;
 use App\Repositories\UserRepository;
 
 $sidebarUserName = '';
+if (isset($_SESSION['user_name']) && is_string($_SESSION['user_name']) && $_SESSION['user_name'] !== '') {
+    $sidebarUserName = $_SESSION['user_name'];
+}
+
 $sidebarUserId = Auth::id();
-if (is_string($sidebarUserId) && $sidebarUserId !== '') {
-    $sidebarRepository = new UserRepository(__DIR__ . '/../../../storage/data');
-    $sidebarUser = $sidebarRepository->findById($sidebarUserId);
-    $sidebarUserName = is_array($sidebarUser) ? (string) ($sidebarUser['name'] ?? '') : '';
+if ($sidebarUserName === '' && is_string($sidebarUserId) && $sidebarUserId !== '') {
+    try {
+        $dataPath = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'data';
+        $sidebarRepository = new UserRepository($dataPath);
+        $sidebarUser = $sidebarRepository->findById($sidebarUserId);
+        if (is_array($sidebarUser) && !empty($sidebarUser['name'])) {
+            $sidebarUserName = (string) $sidebarUser['name'];
+            $_SESSION['user_name'] = $sidebarUserName;
+        }
+    } catch (\Throwable) {
+        // Fallback gracefully jika file storage sedang terkunci atau gagal dibaca
+    }
+}
+
+if ($sidebarUserName === '' && isset($data['user']['name']) && is_string($data['user']['name']) && $data['user']['name'] !== '') {
+    $sidebarUserName = $data['user']['name'];
+}
+
+if ($sidebarUserName === '' && is_string($sidebarUserId) && $sidebarUserId !== '') {
+    $sidebarUserName = 'Pengguna';
 }
 
 $sidebarPath = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $sidebarPath = is_string($sidebarPath) && $sidebarPath !== '' ? $sidebarPath : '/';
 $sidebarItems = [
-    ['/tasks', 'Tugas'],
+    ['/tasks', 'Daftar Tugas'],
     ['/categories', 'Kategori'],
     ['/import', 'Import'],
-    ['/export/xlsx', 'Export XLSX'],
+    ['/export/xlsx', 'Export Excel'],
     ['/export/pdf', 'Export PDF'],
 ];
 ?>
@@ -44,7 +64,7 @@ $sidebarItems = [
         <span class="sidebar__username" title="<?= e($sidebarUserName) ?>"><?= e($sidebarUserName) ?></span>
         <form method="POST" action="/logout" class="sidebar__logout-form">
             <?= (new Csrf())->field() ?>
-            <button type="submit" class="btn btn--logout">Logout</button>
+            <button type="submit" class="btn btn--danger btn--logout">Keluar</button>
         </form>
     </div>
 </aside>
