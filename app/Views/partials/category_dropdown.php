@@ -11,6 +11,7 @@ function category_dropdown(array $categories, string $name, ?string $selected = 
     $instance++;
     $baseId = 'category-dropdown-' . $instance;
     $selected = $selected ?? '';
+    $selectedNone = $selected === '' || $selected === 'none' || $selected === 'tanpa kategori';
     $selectedLabel = 'Tanpa Kategori';
     $selectedColor = '';
 
@@ -49,10 +50,10 @@ function category_dropdown(array $categories, string $name, ?string $selected = 
                 class="category-dropdown__option"
                 role="option"
                 tabindex="-1"
-                aria-selected="<?= $selected === '' ? 'true' : 'false' ?>"
+                aria-selected="<?= $selectedNone ? 'true' : 'false' ?>"
                 data-value=""
                 data-color=""
-            >Tanpa Kategori</li>
+            ><span class="category-chip category-chip--empty" data-color=""></span>Tanpa Kategori</li>
             <?php foreach ($categories as $category): ?>
                 <?php $categoryId = (string) ($category['id'] ?? ''); ?>
                 <li
@@ -62,7 +63,7 @@ function category_dropdown(array $categories, string $name, ?string $selected = 
                     aria-selected="<?= $categoryId === $selected ? 'true' : 'false' ?>"
                     data-value="<?= e($categoryId) ?>"
                     data-color="<?= e((string) ($category['color'] ?? '')) ?>"
-                ><?= e((string) ($category['name'] ?? '')) ?></li>
+                ><span class="category-chip" data-color="<?= e((string) ($category['color'] ?? '')) ?>"></span><?= e((string) ($category['name'] ?? '')) ?></li>
             <?php endforeach; ?>
         </ul>
         <input type="hidden" name="<?= e($name) ?>" value="<?= e($selected) ?>" data-dropdown-value>

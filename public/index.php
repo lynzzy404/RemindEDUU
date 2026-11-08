@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\AuthController;
 use App\Controllers\CategoryController;
+use App\Controllers\TaskController;
 use App\Core\Csrf;
 use App\Core\JsonStore;
 use App\Core\Logger;
@@ -14,6 +15,7 @@ use App\Core\Router;
 use App\Core\Session;
 use App\Core\View;
 use App\Repositories\CategoryRepository;
+use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 
 $config = require __DIR__ . '/../app/bootstrap.php';
@@ -28,6 +30,7 @@ $rateLimiter = new RateLimiter(
 );
 $userRepository = new UserRepository($config['data_path']);
 $categoryRepository = new CategoryRepository($config['data_path']);
+$taskRepository = new TaskRepository($config['data_path']);
 
 /* ── View factory ───────────────────────────────────────────── */
 $viewFactory = static fn (): View => new View(__DIR__ . '/../app/Views');
@@ -103,17 +106,43 @@ $router->post('/logout', static function () use ($authControllerFactory, $requir
     return (new AuthControllerProxy($authControllerFactory()))->logout();
 });
 
-/* Tasks route (stub — placeholder until M3) */
-$router->get('/tasks', static function () use ($session, $viewFactory, $categoryRepository): Response {
-    if ($session->get('user_id') === null) {
-        Response::redirect('/login')->send();
-        exit;
-    }
+$taskControllerFactory = static function () use ($request, $taskRepository, $categoryRepository, $logger, $session): TaskController {
+    return new TaskController($request, $taskRepository, $categoryRepository, $logger, $session);
+};
 
-    return Response::html($viewFactory()->render('tasks/index', [
-        'title' => 'Tugas',
-        'categories' => $categoryRepository->allByUser((string) $session->get('user_id')),
-    ]));
+$router->get('/tasks', static function () use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->index();
+});
+
+$router->get('/tasks/create', static function () use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->createForm();
+});
+
+$router->post('/tasks', static function () use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->create();
+});
+
+$router->get('/tasks/{id}/edit', static function (Request $request, array $parameters) use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->editForm($parameters['id']);
+});
+
+$router->post('/tasks/{id}/update', static function (Request $request, array $parameters) use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->update($parameters['id']);
+});
+
+$router->post('/tasks/{id}/toggle', static function (Request $request, array $parameters) use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->toggle($parameters['id']);
+});
+
+$router->post('/tasks/{id}/delete', static function (Request $request, array $parameters) use ($taskControllerFactory, $requireAuth): Response {
+    $requireAuth();
+    return $taskControllerFactory()->delete($parameters['id']);
 });
 
 $categoryControllerFactory = static function () use ($request, $categoryRepository, $logger, $session): CategoryController {
