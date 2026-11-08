@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Made the Neo-Brutalist layout fluid across mobile, tablet, and wide desktop viewports.
+- Compressed summary cards and task cards on small screens while preserving task metadata and touch targets.
+- Added responsive design tokens for spacing, typography, borders, shadows, and content width.
+
 ## [1.1.0] - 2026-11-08
 
 ### Added

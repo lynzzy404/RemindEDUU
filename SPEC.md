@@ -372,6 +372,11 @@ Validasi **selalu server-side**; validasi di JS hanya untuk UX.
 Palet kategori yang diizinkan (`color`): `#FFE14D #FF6B9D #4D9DFF #5EEAA0 #FF9F43 #B794F6`.
 Font **self-hosted** atau system font (tidak memuat dari CDN pihak ketiga, selaras dengan CSP).
 
+### 6.2a Token skala responsif
+Selain token warna dan komponen di atas, `app.css` menyediakan token ukuran responsif berikut: `--space-1` sampai `--space-6`, `--text-body`, `--text-card-title`, `--text-summary-value`, `--border-width`, `--shadow-size`, `--shadow-lg-size`, `--content-max`, dan `--content-gutter`. Nilainya menggunakan `clamp()`/unit relatif agar spacing, tipografi, border, shadow, dan lebar konten beradaptasi dari 320px sampai layar lebar. Komponen wajib memakai token ini, bukan ukuran desktop tetap yang diulang.
+
+Target layout: pada <=480px `summary-grid` memakai kartu ringkas dalam 2–3 kolom tanpa overflow (3 kolom bila lebar minimum memungkinkan), `task-grid` satu kolom; pada 481–1023px grid memakai 2 kolom; pada >=1024px grid memakai 3 kolom dan konten dibatasi `--content-max`. Seluruh halaman tidak boleh memiliki scroll horizontal; wrapper tabel boleh scroll secara lokal.
+
 ### 6.3 Komponen
 | Komponen | Spesifikasi |
 |---|---|
@@ -383,6 +388,9 @@ Font **self-hosted** atau system font (tidak memuat dari CDN pihak ketiga, selar
 | Flash/Toast | kotak berborder tebal, warna sesuai tipe (sukses/error/info) |
 | Dropdown | panel berborder + shadow, opsi hover kuning, opsi aktif tebal |
 | Modal konfirmasi hapus | overlay solid semi-transparan, kartu putih berborder |
+
+### 6.3a Kepadatan responsif
+Summary card pada layar <=480px memiliki tinggi target sekitar 64–88px dengan nilai tetap terlihat. Task card memakai padding responsif dan deskripsi boleh dibatasi dua baris dengan line clamp hanya untuk presentasi; status, prioritas, kategori, dan tenggat tetap dirender. Kontrol interaktif tetap memiliki target minimal 44x44px. `prefers-reduced-motion` wajib dihormati.
 
 ### Sidebar Navigasi Responsif
 - Hanya dirender untuk user yang sudah login. Guest dan halaman error memakai header sederhana tanpa sidebar.
