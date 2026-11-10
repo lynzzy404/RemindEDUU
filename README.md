@@ -280,4 +280,4 @@ git tag -a v1.0.0 -m "Release v1.0.0"
 
 ## Lisensi
 
-[MIT License](LICENSE) © M. Nur Said.
+[MIT License](LICENSE) © RemindEDU.
